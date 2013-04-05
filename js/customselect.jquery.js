@@ -1,5 +1,5 @@
 /*!
- * jQuery Custom Select Plugin 1.2
+ * jQuery Custom Select Plugin 1.21
  * 2013-04-05
  *
  * http://www.blissmedia.com.au/
@@ -222,7 +222,7 @@
 
         // Select Option
         select: function(value) {
-          $select.val(value);
+          $select.val(value).change();
           $this.find("span").text($select.find("option:selected").text());
           methods.close();
         },
