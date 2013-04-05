@@ -1,5 +1,5 @@
 /*!
- * jQuery Custom Select Plugin 1.21
+ * jQuery Custom Select Plugin 1.22
  * 2013-04-05
  *
  * http://www.blissmedia.com.au/
@@ -195,10 +195,10 @@
             $(this).removeClass("active");
 
             if($options.searchblank || val.length > 0) {
-              if($options.searchvalue && val.match(value)) {
+              if($options.searchvalue && val.indexOf(value) >= 0) {
                 $(this).addClass("active");
               }
-              else if(text.match(value)) {
+              else if(text.indexOf(value) >= 0) {
                 $(this).addClass("active");
               }
             }
