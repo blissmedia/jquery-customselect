@@ -1,0 +1,285 @@
+/*!
+ * jQuery Custom Select Plugin 1.2
+ * 2013-04-05
+ *
+ * http://www.blissmedia.com.au/
+ *
+ * Copyright 2013 Bliss Media
+ * Released under the MIT license:
+ *   http://www.opensource.org/licenses/mit-license.php
+ */
+
+;(function($) {
+  $.fn.customselect = function(method, value) {
+    $(this).each(function() {
+      // Default Options
+      var $options  = {
+        "csclass":      "custom-select",  // Class to match
+        "search":       true,             // Is searchable?
+        "numitems":     4,                // Number of results per page
+        "searchblank":  false,            // Search blank value options?
+        "showblank":    true,             // Show blank value options?
+        "searchvalue":  false,            // Search option values?
+        "hoveropen":    false             // Open the select on hover?
+      };
+
+      // Mobile check
+      var $is_mobile = navigator.platform && navigator.platform.match(/(android|iphone|ipad|blackberry)/) ? true : false;
+
+      // Original Select
+      var $select   = $(this);
+
+      // Custom Select Container
+      var $this     = $select.parents($options.selector+":first");
+
+      var methods   = {
+        init: function() {
+          // Initital Setup
+          var setup = {
+            init: function() {
+              // Create Elements + Events
+              setup.container();
+              setup.value();
+              setup.subcontainer();
+            },
+
+            container: function() {
+              $this = $("<div/>").addClass($options.csclass);
+
+              // Selector Container
+              $select.before($this);
+              $select.appendTo($this);
+              $select.change(function() {
+                methods.select($(this).val());
+              });
+
+              // Standard Events
+              var hover_timeout = null;
+              $this.hover(function() {
+                if(hover_timeout) clearTimeout(hover_timeout);
+                $this.addClass($options.csclass+"-hover");
+              }, function() {
+                if($options.hoveropen) hover_timeout = setTimeout(methods.close, 750);
+                $this.removeClass($options.csclass+"-hover");
+              });
+
+              $(window, document).mouseup(function() {
+                if(!$this.is($options.selector+"-hover")) methods.close();
+                else $this.find("input").focus();
+              });
+            },
+
+            value: function() {
+              var value   = $("<span/>").appendTo($this);
+              value.html($select.find("option:selected").text());
+              if($options.hoveropen) {
+                value.mouseover(methods.open);
+              }
+              else {
+                value.click(methods.toggle);
+              }
+            },
+
+            subcontainer: function() {
+              // Container
+              var subcont = $("<div/>").appendTo($this);
+
+              // Input Box
+              var input   = $("<input type='input'/>").appendTo(subcont);
+              input.keyup(function(e) {
+                if($options.search && $.inArray(e.which, [13,38,40])<0) {
+                  methods.search($(this).val());
+                }
+              }).keydown(function(e) {
+                switch(e.which) {
+                  case 13: // Enter
+                    val = $this.find("ul li.active.option-hover").data("value");
+                    methods.select(val);
+                  break;
+                  case 38: // Up
+                    methods.selectUp();
+                  break;
+                  case 40: // Down
+                    methods.selectDown();
+                  break;
+                  default:
+                    return true;
+                  break;
+                }
+
+                e.preventDefault();
+                return false;
+              }).blur(function() { $(this).val(""); });
+              if(!$options.search) {
+                input.addClass($options.csclass+"-hidden-input");
+              }
+
+              // Scrolling Container
+              var scroll  = $("<div/>").appendTo(subcont);
+
+              // Selectable Items
+              var select  = $("<ul/>").appendTo(scroll);
+              $select.find("option").each(function(i) {
+                var val = $(this).attr("value");
+                if($options.showblank || val.length > 0) {
+                  $("<li/>", {
+                    'class':      'active' + (i==0 ? ' option-hover' : ''),
+                    'data-value': val,
+                    'text':       $(this).text()
+                  }).appendTo(select);
+                }
+              });
+              var options = select.find("li");
+              select.find("li").click(function() {
+                methods.select($(this).data("value"));
+              });
+
+              $this.find("div div").css({
+                "overflow-y": options.length > $options.numitems ? "scroll" : "visible"
+              });
+
+              $("<li/>", {
+                'class':      'no-results',
+                'text':       "No results"
+              }).appendTo(select);
+            }
+          };
+
+          if($select.is("select"+$options.selector)) {
+            setup.init();
+          }
+        },
+
+        // Open/Close Select Box
+        toggle: function() {
+          if($this.is($options.selector+"-open")) {
+            methods.close();
+          }
+          else {
+            methods.open();
+          }
+        },
+
+        // Open Select Box
+        open: function() {
+          $this.addClass($options.csclass+"-open");
+          $this.find("input").focus();
+          $this.find("ul li.no-results").hide();
+          methods._selectMove($select[0].selectedIndex)
+        },
+
+        // Close Select Box
+        close: function() {
+          $this.removeClass($options.csclass+"-open");
+          $this.find("input").val("").blur();
+          $this.find("ul li").not(".no-results").addClass("active");
+
+          var options = $this.find("ul li").not(".no-results");
+          $this.find("div div").css({
+            "overflow-y": options.length > $options.numitems ? "scroll" : "visible"
+          });
+        },
+
+        // Search Options
+        search: function(value) {
+          value = value.toLowerCase();
+
+          var noresults = $this.find("ul li.no-results").hide();
+
+          // Search for Match
+          var options = $this.find("ul li").not(".no-results");
+          options.each(function() {
+            var text = ($(this).text()+"").toLowerCase();
+            var val  = ($(this).data("value")+"").toLowerCase();
+
+            $(this).removeClass("active");
+
+            if($options.searchblank || val.length > 0) {
+              if($options.searchvalue && val.match(value)) {
+                $(this).addClass("active");
+              }
+              else if(text.match(value)) {
+                $(this).addClass("active");
+              }
+            }
+          });
+          options = options.filter(".active").filter(":visible");
+
+          // Set Scroll
+          $this.find("div div").css({
+            "overflow-y": options.length > $options.numitems ? "scroll" : "visible"
+          });
+
+          if(options.length > 0) {
+            // Select First Result
+            methods._selectMove(0);
+          }
+          else {
+            // No Results
+            noresults.show();
+          }
+        },
+
+        // Select Option
+        select: function(value) {
+          $select.val(value);
+          $this.find("span").text($select.find("option:selected").text());
+          methods.close();
+        },
+
+        // Move Selection Up
+        selectUp: function() {
+          var options   = $this.find("ul li.active").not(".no-results");
+          var selected  = options.index(options.filter(".option-hover"));
+
+          var moveTo = selected - 1;
+          moveTo = moveTo < 0 ? options.length - 1 : moveTo;
+
+          methods._selectMove(moveTo);
+        },
+
+        // Move Selection Down
+        selectDown: function() {
+          var options   = $this.find("ul li.active").not(".no-results");
+          var selected  = options.index(options.filter(".option-hover"));
+
+          var moveTo = selected + 1;
+          moveTo = moveTo > options.length - 1 ? 0 : moveTo;
+
+          methods._selectMove(moveTo);
+        },
+
+        // Move Selection to Index
+        _selectMove: function(index) {
+          var options   = $this.find("ul li.active");
+          options.removeClass("option-hover").eq(index).addClass("option-hover");
+
+          var scroll = $this.find("div div");
+          if(scroll.css("overflow-y") == "scroll") {
+            scroll.scrollTop(0);
+            if(index+1 > $options.numitems) {
+              offset = options.eq(index+1 - $options.numitems).offset().top - scroll.offset().top;
+              scroll.scrollTop(offset);
+            }
+          }
+        }
+      };
+
+      // Check for Additional Options
+      if(method && typeof method == "object") {
+        $.extend($options, method);
+
+        method  = "init";
+        value   = null;
+      }
+
+      $options.selector = "."+$options.csclass;
+
+      // Load Requested Method
+      method = method ? method : "init";
+      if(typeof methods[method] == "function") {
+        methods[method].call(this, value);
+      }
+    });
+  };
+})(jQuery);

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Test</title>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+    <script src='js/customselect.jquery.min.js'></script>
+    <link href='css/customselect.jquery.css' rel='stylesheet' />
+  </head>
+  <body>
+    <form>
+      <div style='float:right;padding-right: 50px;'>
+        <b>HTML</b><br />
+        <code>
+          <pre>
+&lt;select id='standard' name='standard' class='custom-select'&gt;
+  &lt;option value=''&gt;None - Please Select&lt;/option&gt;
+  &lt;option value='1'&gt;abc&lt;/option&gt;
+  &lt;option value='2'&gt;bcd&lt;/option&gt;
+  &lt;option value='3'&gt;cde&lt;/option&gt;
+  &lt;option value='4'&gt;def&lt;/option&gt;
+  &lt;option value='5'&gt;efb&lt;/option&gt;
+&lt;/select&gt;
+          </pre>
+        </code>
+
+        <b>JS</b><br />
+        <code>
+          <pre>
+$(function() {
+  $("#standard").customselect();
+});
+          </pre>
+        </code>
+      </div>
+
+      <h1>Standard</h2>
+      <select id='standard' name='standard' class='custom-select'>
+        <option value=''>None - Please Select</option>
+        <option value='1'>abc</option>
+        <option value='2'>bcd</option>
+        <option value='3'>cde</option>
+        <option value='4'>def</option>
+        <option value='5'>efb</option>
+      </select>
+      <br />
+      <input type='submit' />
+      <script>
+      $(function() {
+        $("#standard").customselect();
+      });
+      </script>
+    </form>
+    <br />
+    <br />
+
+    <hr style='clear:both'/>
+
+    <form>
+      <div style='float:right;padding-right: 50px;'>
+        <b>HTML</b><br />
+        <code>
+          <pre>
+&lt;select id='standard' name='standard' class='custom-select'&gt;
+  &lt;option value=''&gt;None - Please Select&lt;/option&gt;
+  &lt;option value='1'&gt;abc&lt;/option&gt;
+  &lt;option value='2'&gt;bcd&lt;/option&gt;
+  &lt;option value='3'&gt;cde&lt;/option&gt;
+  &lt;option value='4'&gt;def&lt;/option&gt;
+  &lt;option value='5'&gt;efb&lt;/option&gt;
+&lt;/select&gt;
+          </pre>
+        </code>
+
+        <b>JS</b><br />
+        <code>
+          <pre>
+$(function() {
+  $("#nosearch").customselect({search: false});
+});
+          </pre>
+        </code>
+      </div>
+
+      <h1>No Search</h2>
+      <select id='nosearch' name='nosearch' class='custom-select'>
+        <option value=''>None - Please Select</option>
+        <option value='1'>abc</option>
+        <option value='2'>bcd</option>
+        <option value='3'>cde</option>
+        <option value='4'>def</option>
+        <option value='5'>efb</option>
+      </select>
+      <br />
+      <input type='submit' />
+      <script>
+      $(function() {
+        $("#nosearch").customselect({search: false});
+      });
+      </script>
+    </form>
+    <br />
+    <br />
+
+    <hr style='clear:both'/>
+
+    <form>
+      <div style='float:right;padding-right: 50px;'>
+        <b>HTML</b><br />
+        <code>
+          <pre>
+&lt;select id='standard' name='standard' class='custom-select'&gt;
+  &lt;option value=''&gt;None - Please Select&lt;/option&gt;
+  &lt;option value='1'&gt;abc&lt;/option&gt;
+  &lt;option value='2'&gt;bcd&lt;/option&gt;
+  &lt;option value='3'&gt;cde&lt;/option&gt;
+  &lt;option value='4'&gt;def&lt;/option&gt;
+  &lt;option value='5'&gt;efb&lt;/option&gt;
+&lt;/select&gt;
+          </pre>
+        </code>
+
+        <b>JS</b><br />
+        <code>
+          <pre>
+$(function() {
+  $("#hover").customselect({
+    search:     false,
+    hoveropen:  true
+  });
+});
+          </pre>
+        </code>
+      </div>
+
+      <h1>Open on hover and no search</h2>
+      <select id='hover' name='hover' class='custom-select'>
+        <option value=''>None - Please Select</option>
+        <option value='1'>abc</option>
+        <option value='2'>bcd</option>
+        <option value='3'>cde</option>
+        <option value='4'>def</option>
+        <option value='5'>efb</option>
+      </select>
+      <br />
+      <input type='submit' />
+      <script>
+      $(function() {
+        $("#hover").customselect({
+          search:     false,
+          hoveropen:  true
+        });
+      });
+      </script>
+    </form>
+  </body>
+</html>
