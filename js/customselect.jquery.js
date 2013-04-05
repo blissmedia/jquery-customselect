@@ -222,7 +222,9 @@
 
         // Select Option
         select: function(value) {
-          $select.val(value).change();
+          if($select.val() != value) {
+            $select.val(value).change();
+          }
           $this.find("span").text($select.find("option:selected").text());
           methods.close();
         },
