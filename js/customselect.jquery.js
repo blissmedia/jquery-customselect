@@ -1,5 +1,5 @@
 /*!
- * jQuery Custom Select Plugin 1.22
+ * jQuery Custom Select Plugin 1.23
  * 2013-04-05
  *
  * http://www.blissmedia.com.au/
@@ -63,7 +63,7 @@
                 $this.removeClass($options.csclass+"-hover");
               });
 
-              $(window, document).mouseup(function() {
+              $(document).mouseup(function() {
                 if(!$this.is($options.selector+"-hover")) methods.close();
                 else $this.find("input").focus();
               });
@@ -182,7 +182,7 @@
 
         // Search Options
         search: function(value) {
-          value = value.toLowerCase();
+          value = $.trim(value.toLowerCase());
 
           var noresults = $this.find("ul li.no-results").hide();
 
@@ -191,17 +191,21 @@
           options.each(function() {
             var text = ($(this).text()+"").toLowerCase();
             var val  = ($(this).data("value")+"").toLowerCase();
-
-            $(this).removeClass("active");
+            var add  = false;
 
             if($options.searchblank || val.length > 0) {
               if($options.searchvalue && val.indexOf(value) >= 0) {
-                $(this).addClass("active");
+                add = true;
               }
               else if(text.indexOf(value) >= 0) {
-                $(this).addClass("active");
+                add = true;
               }
             }
+            else if(value.length == 0) {
+              add = true;
+            }
+
+            add ? $(this).addClass("active") : $(this).removeClass("active");
           });
           options = options.filter(".active").filter(":visible");
 
