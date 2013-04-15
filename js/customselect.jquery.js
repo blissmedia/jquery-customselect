@@ -1,5 +1,5 @@
 /*!
- * jQuery Custom Select Plugin 1.23
+ * jQuery Custom Select Plugin 1.24
  * 2013-04-05
  *
  * http://www.blissmedia.com.au/
@@ -271,20 +271,22 @@
         }
       };
 
-      // Check for Additional Options
-      if(method && typeof method == "object") {
-        $.extend($options, method);
+      var call_method = method;
 
-        method  = "init";
-        value   = null;
+      // Check for Additional Options
+      if(call_method && typeof call_method == "object") {
+        $.extend($options, call_method);
+
+        call_method = "init";
+        value       = null;
       }
 
       $options.selector = "."+$options.csclass;
 
       // Load Requested Method
-      method = method ? method : "init";
-      if(typeof methods[method] == "function") {
-        methods[method].call(this, value);
+      call_method = call_method ? call_method : "init";
+      if(typeof methods[call_method] == "function") {
+        methods[call_method].call(this, value);
       }
     });
   };
