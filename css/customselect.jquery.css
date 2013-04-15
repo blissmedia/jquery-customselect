@@ -42,6 +42,7 @@
   border-top: 0;
   background: #FFFFFF;
   z-index: 10;
+  overflow: hidden;
 }
 .custom-select input {
   width: 298px;
@@ -97,7 +98,8 @@
 ----------------------------------*/
 .custom-select input.custom-select-hidden-input {
   position: absolute !important;
-  top: -10000px;
+  top: 0 !important;
+  left: -1000px !important;
   padding: 0 !important;
   margin: 0 !important;
   border: 0 !important;
