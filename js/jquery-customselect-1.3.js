@@ -1,6 +1,6 @@
 /*!
- * jQuery Custom Select Plugin 1.24
- * 2013-04-05
+ * jQuery Custom Select Plugin 1.3
+ * 2013-06-12
  *
  * http://www.blissmedia.com.au/
  *
@@ -70,7 +70,7 @@
             },
 
             value: function() {
-              var value   = $("<span/>").appendTo($this);
+              var value   = $("<a href='#'/>").appendTo($this);
               value.html($select.find("option:selected").text());
               if($options.hoveropen) {
                 value.mouseover(methods.open);
@@ -101,6 +101,9 @@
                   break;
                   case 40: // Down
                     methods.selectDown();
+                  break;
+                  case 27: // Esc
+                    methods.close();
                   break;
                   default:
                     return true;
@@ -229,7 +232,7 @@
           if($select.val() != value) {
             $select.val(value).change();
           }
-          $this.find("span").text($select.find("option:selected").text());
+          $this.find("a").text($select.find("option:selected").text());
           methods.close();
         },
 
@@ -289,5 +292,7 @@
         methods[call_method].call(this, value);
       }
     });
+
+    return this;
   };
 })(jQuery);
