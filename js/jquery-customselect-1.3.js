@@ -72,6 +72,7 @@
             value: function() {
               var value   = $("<a href='#'/>").appendTo($this);
               value.html($select.find("option:selected").text());
+              value.click(function(e) { e.preventDefault(); });
               if($options.hoveropen) {
                 value.mouseover(methods.open);
               }
@@ -142,8 +143,8 @@
               });
 
               $("<li/>", {
-                'class':      'no-results',
-                'text':       "No results"
+                'class':  'no-results',
+                'text':   "No results"
               }).appendTo(select);
             }
           };
