@@ -1,6 +1,6 @@
 /*!
- * jQuery Custom Select Plugin 1.3
- * 2013-06-12
+ * jQuery Custom Select Plugin 1.4.0
+ * 2013-07-05
  *
  * http://www.blissmedia.com.au/
  *
@@ -107,4 +107,15 @@
   border: 0 !important;
   background: transparent !important;
   z-index: -1 !important;
+}
+
+/* Mobile Override
+----------------------------------*/
+.custom-select-mobile select {
+  display: inline !important;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }

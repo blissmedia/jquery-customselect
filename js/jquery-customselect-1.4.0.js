@@ -1,6 +1,6 @@
 /*!
- * jQuery Custom Select Plugin 1.3
- * 2013-06-12
+ * jQuery Custom Select Plugin 1.4.0
+ * 2013-07-05
  *
  * http://www.blissmedia.com.au/
  *
@@ -20,11 +20,14 @@
         "searchblank":  false,            // Search blank value options?
         "showblank":    true,             // Show blank value options?
         "searchvalue":  false,            // Search option values?
-        "hoveropen":    false             // Open the select on hover?
+        "hoveropen":    false,            // Open the select on hover?
+        "mobilecheck":  function() {      // Mobile check function / boolean
+          return navigator.platform && navigator.userAgent.match(/(android|iphone|ipad|blackberry)/i);
+        }
       };
 
       // Mobile check
-      var $is_mobile = navigator.platform && navigator.platform.match(/(android|iphone|ipad|blackberry)/) ? true : false;
+      var $is_mobile = typeof $options.mobilecheck == "function" ? $options.mobilecheck.call() : $options.mobilecheck;
 
       // Original Select
       var $select   = $(this);
@@ -45,6 +48,10 @@
 
             container: function() {
               $this = $("<div/>").addClass($options.csclass);
+              if($is_mobile) {
+                $this.addClass($options.csclass + "-mobile");
+                $select.css("opacity", 0);
+              }
 
               // Selector Container
               $select.before($this);
@@ -71,6 +78,7 @@
 
             value: function() {
               var value   = $("<a href='#'/>").appendTo($this);
+              $select.appendTo($this);
               value.html($select.find("option:selected").text());
               value.click(function(e) { e.preventDefault(); });
               if($options.hoveropen) {
@@ -166,10 +174,12 @@
 
         // Open Select Box
         open: function() {
-          $this.addClass($options.csclass+"-open");
-          $this.find("input").focus();
-          $this.find("ul li.no-results").hide();
-          methods._selectMove($select[0].selectedIndex)
+          if(!$is_mobile) {
+            $this.addClass($options.csclass+"-open");
+            $this.find("input").focus();
+            $this.find("ul li.no-results").hide();
+            methods._selectMove($select[0].selectedIndex)
+          }
         },
 
         // Close Select Box
