@@ -1,6 +1,6 @@
 /*!
  * jQuery Custom Select Plugin - Master Source
- * 2013-07-05
+ * 2013-08-06
  *
  * http://www.blissmedia.com.au/
  *
@@ -279,6 +279,9 @@
             scroll.scrollTop(0);
             if(index+1 > $options.numitems) {
               offset = options.eq(index+1 - $options.numitems).offset().top - scroll.offset().top;
+              if(index == $select.find("option").length-1) {
+                offset = scroll.find("ul").height();
+              }
               scroll.scrollTop(offset);
             }
           }
