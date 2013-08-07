@@ -1,6 +1,6 @@
 /*!
- * jQuery Custom Select Plugin 1.4.1
- * 2013-08-06
+ * jQuery Custom Select Plugin 1.5.0
+ * 2013-08-07
  *
  * http://www.blissmedia.com.au/
  *
@@ -11,26 +11,37 @@
 
 ;(function($) {
   $.fn.customselect = function(method, value) {
-    $(this).each(function() {
-      // Default Options
-      var $options  = {
-        "csclass":      "custom-select",  // Class to match
-        "search":       true,             // Is searchable?
-        "numitems":     4,                // Number of results per page
-        "searchblank":  false,            // Search blank value options?
-        "showblank":    true,             // Show blank value options?
-        "searchvalue":  false,            // Search option values?
-        "hoveropen":    false,            // Open the select on hover?
-        "mobilecheck":  function() {      // Mobile check function / boolean
-          return navigator.platform && navigator.userAgent.match(/(android|iphone|ipad|blackberry)/i);
-        }
-      };
 
-      // Mobile check
-      var $is_mobile = typeof $options.mobilecheck == "function" ? $options.mobilecheck.call() : $options.mobilecheck;
+    // Default Options
+    var $options  = {
+      "csclass":      "custom-select",  // Class to match
+      "search":       true,             // Is searchable?
+      "numitems":     4,                // Number of results per page
+      "searchblank":  false,            // Search blank value options?
+      "showblank":    true,             // Show blank value options?
+      "searchvalue":  false,            // Search option values?
+      "hoveropen":    false,            // Open the select on hover?
+      "mobilecheck":  function() {      // Mobile check function / boolean
+        return navigator.platform && navigator.userAgent.match(/(android|iphone|ipad|blackberry)/i);
+      }
+    };
+
+    // Mobile check
+    var $is_mobile = typeof $options.mobilecheck == "function" ? $options.mobilecheck.call() : $options.mobilecheck;
+
+    // Select validation
+    var items = $is_mobile ? $(this).filter("select") : $(this).filter("select:not([multiple])");
+
+    // Customselect control
+    items.each(function() {
 
       // Original Select
       var $select   = $(this);
+
+      // Preset Options
+      if($select.data("cs-options")) {
+        $.extend($options, $select.data("cs-options"));
+      }
 
       // Custom Select Container
       var $this     = $select.parents($options.selector+":first");
@@ -285,6 +296,13 @@
               scroll.scrollTop(offset);
             }
           }
+        },
+
+        destroy: function() {
+          if($select.data("cs-options")) {
+            $select.removeData("cs-options").insertAfter($this);
+            $this.remove();
+          }
         }
       };
 
@@ -305,6 +323,8 @@
       if(typeof methods[call_method] == "function") {
         methods[call_method].call(this, value);
       }
+
+      $select.data("cs-options", $options);
     });
 
     return this;
