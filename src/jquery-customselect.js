@@ -68,9 +68,7 @@
               // Selector Container
               $select.before($this);
               $select.appendTo($this);
-              $select.change(function() {
-                methods.select($(this).val());
-              });
+              $select.off("change", setup._onchange).change(setup._onchange);
 
               // Standard Events
               var hover_timeout = null;
@@ -154,7 +152,7 @@
               var select  = $("<ul/>").appendTo(scroll);
               $select.find("option").each(function(i) {
                 var val = $(this).attr("value");
-                var txt = $(this).text()
+                var txt = $(this).text();
                 if($options.showblank || val.length > 0) {
                   $("<li/>", {
                     'class':      'active' + (i==0 ? ' option-hover' : ''),
@@ -179,7 +177,7 @@
             }
           };
 
-          if($select.is("select"+$options.selector)) {
+          if($select.is("select"+$options.selector) && !$select.data("cs-options")) {
             setup.init();
           }
         },
@@ -263,7 +261,7 @@
         searchmove: function(value) {
           var index = [];
           $select.find("option").each(function(i) {
-            if($(this).text().indexOf(value) == 0) {
+            if($(this).text().toLowerCase().indexOf(value.toLowerCase()) == 0) {
               index.push(i);
             }
           });
@@ -305,6 +303,14 @@
           methods._selectMove(moveTo);
         },
 
+        // Destroy customselect instance
+        destroy: function() {
+          if($select.data("cs-options")) {
+            $select.removeData("cs-options").insertAfter($this);
+            $this.remove();
+          }
+        },
+
         // Move Selection to Index
         _selectMove: function(index) {
           var options   = $this.find("ul li.active");
@@ -323,11 +329,9 @@
           }
         },
 
-        destroy: function() {
-          if($select.data("cs-options")) {
-            $select.removeData("cs-options").insertAfter($this);
-            $this.remove();
-          }
+        // Catch select change event and apply to customselect
+        _onchange: function() {
+          methods.select($(this).val());
         }
       };
 
@@ -349,7 +353,9 @@
         methods[call_method].call(this, value);
       }
 
-      $select.data("cs-options", $options);
+      if(call_method != "destroy") {
+        $select.data("cs-options", $options);
+      }
     });
 
     return this;
