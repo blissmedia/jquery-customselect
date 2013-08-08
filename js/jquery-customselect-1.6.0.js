@@ -21,6 +21,7 @@
       "showblank":    true,             // Show blank value options?
       "searchvalue":  false,            // Search option values?
       "hoveropen":    false,            // Open the select on hover?
+      "emptytext":    "",               // Change empty option text to a set value
       "mobilecheck":  function() {      // Mobile check function / boolean
         return navigator.platform && navigator.userAgent.match(/(android|iphone|ipad|blackberry)/i);
       }
@@ -67,7 +68,9 @@
               // Selector Container
               $select.before($this);
               $select.appendTo($this);
-              $select.off("change", setup._onchange).change(setup._onchange);
+              $select.change(function() {
+                methods.select($(this).val());
+              });
 
               // Standard Events
               var hover_timeout = null;
@@ -86,10 +89,13 @@
             },
 
             value: function() {
-              var value   = $("<a href='#'/>").appendTo($this);
+              var value = $("<a href='#'/>").appendTo($this);
               $select.appendTo($this);
-              value.html($select.find("option:selected").text());
-              value.click(function(e) { e.preventDefault(); });
+              var txt = $select.find("option:selected").text();
+              value.html(txt.length > 0 ? txt : $options.emptytext)
+                    .click(function(e) { e.preventDefault(); })
+                    .focus(function() { $this.addClass($options.csclass+"-focus"); })
+                    .blur(function() { $this.removeClass($options.csclass+"-focus"); });
               if($options.hoveropen) {
                 value.mouseover(methods.open);
               }
@@ -148,11 +154,12 @@
               var select  = $("<ul/>").appendTo(scroll);
               $select.find("option").each(function(i) {
                 var val = $(this).attr("value");
+                var txt = $(this).text()
                 if($options.showblank || val.length > 0) {
                   $("<li/>", {
                     'class':      'active' + (i==0 ? ' option-hover' : ''),
                     'data-value': val,
-                    'text':       $(this).text()
+                    'text':       txt.length > 0 ? txt : $options.emptytext
                   }).appendTo(select);
                 }
               });
@@ -169,10 +176,6 @@
                 'class':  'no-results',
                 'text':   "No results"
               }).appendTo(select);
-            },
-
-            _onchange: function() {
-              methods.select($(this).val());
             }
           };
 
@@ -260,7 +263,7 @@
         searchmove: function(value) {
           var index = [];
           $select.find("option").each(function(i) {
-            if($(this).text().toLowerCase().indexOf(value.toLowerCase()) == 0) {
+            if($(this).text().indexOf(value) == 0) {
               index.push(i);
             }
           });
@@ -275,7 +278,8 @@
           if($select.val() != value) {
             $select.val(value).change();
           }
-          $this.find("a").text($select.find("option:selected").text());
+          var txt = $select.find("option:selected").text();
+          $this.find("a").text(txt.length > 0 ? txt : $options.emptytext);
           methods.close();
         },
 
@@ -301,14 +305,6 @@
           methods._selectMove(moveTo);
         },
 
-        // Destroy this Customselect
-        destroy: function() {
-          if($select.data("cs-options")) {
-            $select.removeData("cs-options").insertAfter($this);
-            $this.remove();
-          }
-        },
-
         // Move Selection to Index
         _selectMove: function(index) {
           var options   = $this.find("ul li.active");
@@ -324,6 +320,13 @@
               }
               scroll.scrollTop(offset);
             }
+          }
+        },
+
+        destroy: function() {
+          if($select.data("cs-options")) {
+            $select.removeData("cs-options").insertAfter($this);
+            $this.remove();
           }
         }
       };
