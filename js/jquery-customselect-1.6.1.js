@@ -1,5 +1,5 @@
 /*!
- * jQuery Custom Select Plugin - Master Source
+ * jQuery Custom Select Plugin 1.6.1
  * 2013-08-20
  *
  * http://www.blissmedia.com.au/
