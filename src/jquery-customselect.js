@@ -284,7 +284,6 @@
 
         // Select Option
         select: function(value) {
-          console.log("select " + value)
           if($select.val() != value) {
             $select.val(value).change();
           }
