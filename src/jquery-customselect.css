@@ -1,6 +1,6 @@
 /*!
  * jQuery Custom Select Plugin - Master Source
- * 2014-02-06
+ * 2013-08-21
  *
  * http://www.blissmedia.com.au/
  *
@@ -15,8 +15,8 @@
   position: relative;
   width: 320px;
   height: 36px;
-  border: 1px solid #888;
-  background: #fff;
+  border: 1px solid #888888;
+  background: #FFFFFF;
   -webkit-user-select: none;
   -khtml-user-select: none;
   -moz-user-select: none;
@@ -48,7 +48,7 @@
   left: 0;
   margin: 1px 0 0 -1px;
   width: 100%;
-  border: 1px solid #888;
+  border: 1px solid #888888;
   border-top: 0;
   background: #FFFFFF;
   z-index: 10;
@@ -56,7 +56,7 @@
 }
 .custom-select input {
   width: 298px;
-  border: 1px solid #888;
+  border: 1px solid #888888;
   margin: 5px 5px 0;
   padding: 5px;
   font-size: 14px;
@@ -82,34 +82,23 @@
   cursor: pointer;
 }
 .custom-select div ul li:hover {
-  background: #66bbff;
-  color: #fff;
+  background: #66BBFF;
+  color: #FFFFFF;
 }
 .custom-select div ul li.option-hover {
-  background: #3399ff;
-  color: #fff;
-}
-.custom-select div ul li.option-disabled {
-  color: #999;
-}
-.custom-select div ul li.option-disabled:hover {
-  background: #ff9999;
-  color: #fff;
-}
-.custom-select div ul li.option-hover.option-disabled {
-  background: #ff6666;
-  color: #fff;
+  background: #3399FF;
+  color: #FFFFFF;
 }
 .custom-select div ul li.no-results {
   display: none;
   background: #f2f2f2;
-  color: #000;
+  color: #000000;
 }
 
 /* Custom Select - Open
 ----------------------------------*/
 .custom-select-open {
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #eeeeee;
 }
 .custom-select-open div {
   display: block;

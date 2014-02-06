@@ -1,6 +1,6 @@
 /*!
  * jQuery Custom Select Plugin - Master Source
- * 2014-02-06
+ * 2013-08-21
  *
  * http://www.blissmedia.com.au/
  *
@@ -22,7 +22,6 @@
       "searchvalue":  false,            // Search option values?
       "hoveropen":    false,            // Open the select on hover?
       "emptytext":    "",               // Change empty option text to a set value
-      "showdisabled": false,            // Show disabled options
       "mobilecheck":  function() {      // Mobile check function / boolean
         return navigator.platform && navigator.userAgent.match(/(android|iphone|ipad|blackberry)/i);
       }
@@ -130,9 +129,8 @@
               }).keydown(function(e) {
                 switch(e.which) {
                   case 13: // Enter
-                    val       = $this.find("ul li.active.option-hover").data("value");
-                    disabled  = $this.find("ul li.active.option-hover").is(".option-disabled");
-                    methods.select(val, disabled);
+                    val = $this.find("ul li.active.option-hover").data("value");
+                    methods.select(val);
                   break;
                   case 38: // Up
                     methods.selectUp();
@@ -161,14 +159,11 @@
               // Selectable Items
               var select  = $("<ul/>").appendTo(scroll);
               $select.find("option").each(function(i) {
-                var val       = $(this).attr("value");
-                var txt       = $(this).text();
-                var disabled  = $(this).is(":disabled");
-                if(($options.showblank || val.length > 0) && ($options.showdisabled || !disabled)){
+                var val = $(this).attr("value");
+                var txt = $(this).text();
+                if($options.showblank || val.length > 0) {
                   $("<li/>", {
-                    'class':      'active'
-                                    + (i==0 ? ' option-hover' : '')
-                                    + ($(this).is(":disabled") ? ' option-disabled' : ''),
+                    'class':      'active' + (i==0 ? ' option-hover' : ''),
                     'data-value': val,
                     'text':       txt.length > 0 ? txt : $options.emptytext
                   }).appendTo(select);
@@ -176,7 +171,7 @@
               });
               var options = select.find("li");
               select.find("li").click(function() {
-                methods.select($(this).data("value"), $(this).is(".option-disabled"));
+                methods.select($(this).data("value"));
               });
 
               $this.find("div div").css({
@@ -291,15 +286,13 @@
         },
 
         // Select Option
-        select: function(value, disabled) {
-          if(!disabled) {
-            if($select.val() != value) {
-              $select.val(value).change();
-            }
-            var txt = $select.find("option:selected").text();
-            $this.find("a span").text(txt.length > 0 ? txt : $options.emptytext);
-            methods.close();
+        select: function(value) {
+          if($select.val() != value) {
+            $select.val(value).change();
           }
+          var txt = $select.find("option:selected").text();
+          $this.find("a span").text(txt.length > 0 ? txt : $options.emptytext);
+          methods.close();
         },
 
         // Move Selection Up
