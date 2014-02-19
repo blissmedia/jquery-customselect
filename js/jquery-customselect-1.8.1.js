@@ -1,6 +1,6 @@
 /*!
- * jQuery Custom Select Plugin 1.5.0
- * 2013-08-07
+ * jQuery Custom Select Plugin 1.8.1
+ * 2014-02-19
  *
  * http://www.blissmedia.com.au/
  *
@@ -21,10 +21,17 @@
       "showblank":    true,             // Show blank value options?
       "searchvalue":  false,            // Search option values?
       "hoveropen":    false,            // Open the select on hover?
+      "emptytext":    "",               // Change empty option text to a set value
+      "showdisabled": false,            // Show disabled options
       "mobilecheck":  function() {      // Mobile check function / boolean
         return navigator.platform && navigator.userAgent.match(/(android|iphone|ipad|blackberry)/i);
       }
     };
+
+    // Check for Additional Options
+    if(method && typeof method == "object") {
+      $.extend($options, method);
+    }
 
     // Mobile check
     var $is_mobile = typeof $options.mobilecheck == "function" ? $options.mobilecheck.call() : $options.mobilecheck;
@@ -67,9 +74,7 @@
               // Selector Container
               $select.before($this);
               $select.appendTo($this);
-              $select.change(function() {
-                methods.select($(this).val());
-              });
+              $select.off("change", setup._onchange).change(setup._onchange);
 
               // Standard Events
               var hover_timeout = null;
@@ -88,10 +93,16 @@
             },
 
             value: function() {
-              var value   = $("<a href='#'/>").appendTo($this);
+              var value = $("<a href='#'><span/></a>").appendTo($this);
               $select.appendTo($this);
-              value.html($select.find("option:selected").text());
-              value.click(function(e) { e.preventDefault(); });
+
+              value.click(function(e) { e.preventDefault(); })
+                    .focus(function() { $this.addClass($options.csclass+"-focus"); })
+                    .blur(function() { $this.removeClass($options.csclass+"-focus"); });
+
+              var txt   = $select.find("option:selected").text();
+              value.find("span").html(txt.length > 0 ? txt : $options.emptytext);
+
               if($options.hoveropen) {
                 value.mouseover(methods.open);
               }
@@ -107,14 +118,21 @@
               // Input Box
               var input   = $("<input type='input'/>").appendTo(subcont);
               input.keyup(function(e) {
-                if($options.search && $.inArray(e.which, [13,38,40])<0) {
-                  methods.search($(this).val());
+                if($.inArray(e.which, [13,38,40])<0) {
+                  if($options.search) {
+                    methods.search($(this).val());
+                  }
+                  else {
+                    methods.searchmove($(this).val());
+                    $(this).val("");
+                  }
                 }
               }).keydown(function(e) {
                 switch(e.which) {
                   case 13: // Enter
-                    val = $this.find("ul li.active.option-hover").data("value");
-                    methods.select(val);
+                    val       = $this.find("ul li.active.option-hover").data("value");
+                    disabled  = $this.find("ul li.active.option-hover").is(".option-disabled");
+                    methods.select(val, disabled);
                   break;
                   case 38: // Up
                     methods.selectUp();
@@ -143,18 +161,22 @@
               // Selectable Items
               var select  = $("<ul/>").appendTo(scroll);
               $select.find("option").each(function(i) {
-                var val = $(this).attr("value");
-                if($options.showblank || val.length > 0) {
+                var val       = $(this).attr("value");
+                var txt       = $(this).text();
+                var disabled  = $(this).is(":disabled");
+                if(($options.showblank || val.length > 0) && ($options.showdisabled || !disabled)){
                   $("<li/>", {
-                    'class':      'active' + (i==0 ? ' option-hover' : ''),
+                    'class':      'active'
+                                    + (i==0 ? ' option-hover' : '')
+                                    + ($(this).is(":disabled") ? ' option-disabled' : ''),
                     'data-value': val,
-                    'text':       $(this).text()
+                    'text':       txt.length > 0 ? txt : $options.emptytext
                   }).appendTo(select);
                 }
               });
               var options = select.find("li");
               select.find("li").click(function() {
-                methods.select($(this).data("value"));
+                methods.select($(this).data("value"), $(this).is(".option-disabled"));
               });
 
               $this.find("div div").css({
@@ -165,10 +187,16 @@
                 'class':  'no-results',
                 'text':   "No results"
               }).appendTo(select);
+            },
+
+            // Catch select change event and apply to customselect
+            _onchange: function() {
+              $select.val($(this).val());
+              methods.select($(this).val());
             }
           };
 
-          if($select.is("select"+$options.selector)) {
+          if($select.is("select"+$options.selector) && !$select.data("cs-options")) {
             setup.init();
           }
         },
@@ -189,7 +217,7 @@
             $this.addClass($options.csclass+"-open");
             $this.find("input").focus();
             $this.find("ul li.no-results").hide();
-            methods._selectMove($select[0].selectedIndex)
+            methods._selectMove($select.get(0).selectedIndex)
           }
         },
 
@@ -203,6 +231,8 @@
           $this.find("div div").css({
             "overflow-y": options.length > $options.numitems ? "scroll" : "visible"
           });
+
+          $this.find("a").focus();
         },
 
         // Search Options
@@ -249,13 +279,29 @@
           }
         },
 
-        // Select Option
-        select: function(value) {
-          if($select.val() != value) {
-            $select.val(value).change();
+        searchmove: function(value) {
+          var index = [];
+          $select.find("option").each(function(i) {
+            if($(this).text().toLowerCase().indexOf(value.toLowerCase()) == 0) {
+              index.push(i);
+            }
+          });
+
+          if(index.length > 0) {
+            methods._selectMove(index[0]);
           }
-          $this.find("a").text($select.find("option:selected").text());
-          methods.close();
+        },
+
+        // Select Option
+        select: function(value, disabled) {
+          if(!disabled) {
+            if($select.val() != value) {
+              $select.val(value).change();
+            }
+            var txt = $select.find("option:selected").text();
+            $this.find("a span").text(txt.length > 0 ? txt : $options.emptytext);
+            methods.close();
+          }
         },
 
         // Move Selection Up
@@ -280,6 +326,14 @@
           methods._selectMove(moveTo);
         },
 
+        // Destroy customselect instance
+        destroy: function() {
+          if($select.data("cs-options")) {
+            $select.removeData("cs-options").insertAfter($this);
+            $this.remove();
+          }
+        },
+
         // Move Selection to Index
         _selectMove: function(index) {
           var options   = $this.find("ul li.active");
@@ -288,20 +342,13 @@
           var scroll = $this.find("div div");
           if(scroll.css("overflow-y") == "scroll") {
             scroll.scrollTop(0);
-            if(index+1 > $options.numitems) {
-              offset = options.eq(index+1 - $options.numitems).offset().top - scroll.offset().top;
-              if(index == $select.find("option").length-1) {
-                offset = scroll.find("ul").height();
-              }
+
+            var selected = options.eq(index);
+            offset = selected.offset().top + selected.outerHeight() - scroll.offset().top - scroll.height();
+
+            if(offset > 0) {
               scroll.scrollTop(offset);
             }
-          }
-        },
-
-        destroy: function() {
-          if($select.data("cs-options")) {
-            $select.removeData("cs-options").insertAfter($this);
-            $this.remove();
           }
         }
       };
@@ -310,8 +357,6 @@
 
       // Check for Additional Options
       if(call_method && typeof call_method == "object") {
-        $.extend($options, call_method);
-
         call_method = "init";
         value       = null;
       }
@@ -324,7 +369,9 @@
         methods[call_method].call(this, value);
       }
 
-      $select.data("cs-options", $options);
+      if(call_method != "destroy") {
+        $select.data("cs-options", $options);
+      }
     });
 
     return this;

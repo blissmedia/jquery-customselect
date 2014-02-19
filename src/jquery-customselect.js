@@ -1,6 +1,6 @@
 /*!
  * jQuery Custom Select Plugin - Master Source
- * 2014-02-06
+ * 2014-02-19
  *
  * http://www.blissmedia.com.au/
  *
@@ -231,6 +231,8 @@
           $this.find("div div").css({
             "overflow-y": options.length > $options.numitems ? "scroll" : "visible"
           });
+
+          $this.find("a").focus();
         },
 
         // Search Options
