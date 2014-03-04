@@ -1,6 +1,6 @@
 /*!
- * jQuery Custom Select Plugin 1.8.1
- * 2014-02-19
+ * jQuery Custom Select Plugin 1.8.2
+ * 2014-03-04
  *
  * http://www.blissmedia.com.au/
  *
@@ -87,8 +87,10 @@
               });
 
               $(document).mouseup(function() {
-                if(!$this.is($options.selector+"-hover")) methods.close();
-                else $this.find("input").focus();
+                if($this.is($options.selector+"-open")) {
+                  if(!$this.is($options.selector+"-hover")) methods.close();
+                  else $this.find("input").focus();
+                }
               });
             },
 
