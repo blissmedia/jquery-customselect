@@ -1,10 +1,10 @@
 /*!
  * jQuery Custom Select Plugin - Master Source
- * 2014-03-04
+ * 2014-06-17
  *
  * http://www.blissmedia.com.au/
  *
- * Copyright 2013 Bliss Media
+ * Copyright 2014 Bliss Media
  * Released under the MIT license:
  *   http://www.opensource.org/licenses/mit-license.php
  */
@@ -98,9 +98,70 @@
               var value = $("<a href='#'><span/></a>").appendTo($this);
               $select.appendTo($this);
 
+              var searchvalue = "";
+              var searchtimer = null;
               value.click(function(e) { e.preventDefault(); })
                     .focus(function() { $this.addClass($options.csclass+"-focus"); })
                     .blur(function() { $this.removeClass($options.csclass+"-focus"); });
+              $("html").keyup(function(e) {
+                if(value.is(":focus")) {
+                  var keycode = e.which;
+                  var options = $select.find("option").not(":disabled");
+                  if(keycode >= 48 && keycode <= 90) { // 0-9 a-z
+                    searchvalue += String.fromCharCode(keycode).toLowerCase();
+                    for(var i=0;i<options.length;i++) {
+                      var option  = options.eq(i);
+                      var text    = (option.text()+"").toLowerCase();
+
+                      if(!option.is(":disabled") && $options.searchblank || text.length > 0) {
+                        if(text.indexOf(searchvalue) == 0) {
+                          $select.val(option.attr("value")).change();
+                          break;
+                        }
+                      }
+                    };
+
+                    if(searchtimer) clearTimeout(searchtimer);
+                    searchtimer = setTimeout(function() {
+                      searchvalue = "";
+                    }, 1000);
+
+                    e.preventDefault();
+                  }
+                  else if(keycode == 27) {
+                    if(searchtimer) clearTimeout(searchtimer);
+                    searchvalue = "";
+
+                    e.preventDefault();
+                  }
+                  else if(keycode == 38) { // Up
+                    var selected  = $select.find("option:selected");
+                    var index     = options.index(selected);
+                    if(index > 0) {
+                      $select.val(options.eq(index-1).attr("value"));
+                    }
+                    else {
+                      $select.val(options.eq(options.length-1).attr("value"));
+                    }
+                    $select.change();
+
+                    e.preventDefault();
+                  }
+                  else if(keycode == 40) { // Down
+                    var selected  = $select.find("option:selected");
+                    var index     = options.index(selected);
+                    if(index < options.length-1) {
+                      $select.val(options.eq(index+1).attr("value"));
+                    }
+                    else {
+                      $select.val(options.eq(0).attr("value"));
+                    }
+                    $select.change();
+
+                    e.preventDefault();
+                  }
+                }
+              });
 
               var txt   = $select.find("option:selected").text();
               value.find("span").html(txt.length > 0 ? txt : $options.emptytext);
