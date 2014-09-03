@@ -1,6 +1,6 @@
 /*!
  * jQuery Custom Select Plugin 1.9.0
- * 2014-06-17
+ * 2014-09-03
  *
  * http://www.blissmedia.com.au/
  *
@@ -14,16 +14,17 @@
 
     // Default Options
     var $options  = {
-      "csclass":      "custom-select",  // Class to match
-      "search":       true,             // Is searchable?
-      "numitems":     4,                // Number of results per page
-      "searchblank":  false,            // Search blank value options?
-      "showblank":    true,             // Show blank value options?
-      "searchvalue":  false,            // Search option values?
-      "hoveropen":    false,            // Open the select on hover?
-      "emptytext":    "",               // Change empty option text to a set value
-      "showdisabled": false,            // Show disabled options
-      "mobilecheck":  function() {      // Mobile check function / boolean
+      "csclass"         : "custom-select",  // Class to match
+      "search"          : true,             // Is searchable?
+      "numitems"        : 4,                // Number of results per page
+      "searchblank"     : false,            // Search blank value options?
+      "showblank"       : true,             // Show blank value options?
+      "searchvalue"     : false,            // Search option values?
+      "hoveropen"       : false,            // Open the select on hover?
+      "emptytext"       : "",               // Change empty option text to a set value
+      "showdisabled"    : false,            // Show disabled options
+      "useoptionclass"  : false,
+      "mobilecheck"     : function() {      // Mobile check function / boolean
         return navigator.platform && navigator.userAgent.match(/(android|iphone|ipad|blackberry)/i);
       }
     };
@@ -163,8 +164,12 @@
                 }
               });
 
-              var txt   = $select.find("option:selected").text();
-              value.find("span").html(txt.length > 0 ? txt : $options.emptytext);
+              var option = $select.find("option:selected");
+              value.find("span").html(option.text().length > 0 ? option.text() : $options.emptytext);
+              value.removeAttr("class");
+              if($options.useoptionclass && option.attr("class")) {
+                value.addClass(option.attr("class") || "");
+              }
 
               if($options.hoveropen) {
                 value.mouseover(methods.open);
@@ -231,7 +236,8 @@
                   $("<li/>", {
                     'class':      'active'
                                     + (i==0 ? ' option-hover' : '')
-                                    + ($(this).is(":disabled") ? ' option-disabled' : ''),
+                                    + ($(this).is(":disabled") ? ' option-disabled' : '')
+                                    + ($options.useoptionclass && $(this).attr("class") ? ' '+$(this).attr("class") : ''),
                     'data-value': val,
                     'text':       txt.length > 0 ? txt : $options.emptytext
                   }).appendTo(select);
@@ -361,8 +367,13 @@
             if($select.val() != value) {
               $select.val(value).change();
             }
-            var txt = $select.find("option:selected").text();
-            $this.find("a span").text(txt.length > 0 ? txt : $options.emptytext);
+            var option  = $select.find("option:selected");
+            var link    = $this.find("a");
+            link.find("span").text(option.text().length > 0 ? option.text() : $options.emptytext);
+            link.removeAttr("class");
+            if($options.useoptionclass && option.attr("class")) {
+              link.addClass(option.attr("class") || "");
+            }
             methods.close();
           }
         },
